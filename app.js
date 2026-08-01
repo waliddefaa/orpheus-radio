@@ -9,7 +9,7 @@ const stations=[
  {id:'mgharba',name:'100% Mgharba',genre:'Moroccan',desc:'A dedicated stream for contemporary Moroccan artists and songs.',url:'https://mgharba.ice.infomaniak.ch/mgharba-128.mp3',color:'#185844',accent:'#d9a33c'},
  {id:'medina',name:'Medina FM',genre:'Moroccan',desc:'Moroccan music, conversation and culture from Meknes.',url:'https://medinafm.ice.infomaniak.ch/medinafm-128.mp3',color:'#8a3b20',accent:'#e5bd68'},
  {id:'fipjazz',name:'FIP Jazz',genre:'Jazz',desc:'A refined mix spanning jazz classics, modern players and new discoveries.',url:'https://icecast.radiofrance.fr/fipjazz-midfi.mp3',color:'#26384a',accent:'#d49b43'},
- {id:'fipblues',name:'FIP Blues',genre:'Blues',desc:'Electric, acoustic and roots blues selected around the clock.',url:'https://icecast.radiofrance.fr/fipblues-midfi.mp3',color:'#243f46',accent:'#c96536'},
+ {id:'blueswave',name:'BluesWave Radio',genre:'Blues',desc:'Blues and blues-rock selections broadcasting live from Athens.',url:'https://blueswave.radio:8000/blueswave',color:'#243f46',accent:'#c96536'},
  {id:'fiphop',name:'FIP Hip-Hop',genre:'Hip-Hop',desc:'Old-school foundations, fresh rap and beats from across the map.',url:'https://icecast.radiofrance.fr/fiphiphop-midfi.mp3',color:'#3b253d',accent:'#e16635'},
  {id:'hot108',name:'Hot 108 Jamz',genre:'Hip-Hop',desc:'Current hip-hop and R&B hits broadcasting live from New York.',url:'https://live.powerhitz.com/hot108',color:'#16191e',accent:'#d94c29'}
 ];
