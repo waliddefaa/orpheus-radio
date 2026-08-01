@@ -38,14 +38,22 @@
       <div class="console" aria-label="Radio player controls">
         <div class="dial">
           <span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span>
-          <div class="dial-line"><i></i></div>
+          <div class="dial-line">
+            <i id="tunerNeedle"><span id="frequencyReadout">88.4</span></i>
+          </div>
         </div>
         <div class="visualizer" id="visualizer" aria-hidden="true"></div>
         <div class="console-bottom">
           <div class="album-art" id="albumArt"><div class="sun"></div><div class="mountain one"></div><div class="mountain two"></div></div>
           <div class="knob-wrap">
             <label for="volume">Volume <output id="volumeOutput">70</output></label>
+            <div class="volume-knob" id="volumeKnob" aria-hidden="true"><i></i></div>
             <input id="volume" type="range" min="0" max="100" value="70" aria-label="Volume">
+            <div class="station-skip" aria-label="Station navigation">
+              <button id="prevStation" aria-label="Previous station">←</button>
+              <span>Station</span>
+              <button id="nextStation" aria-label="Next station">→</button>
+            </div>
           </div>
           <div class="signal"><span>ON AIR</span><i></i></div>
         </div>
