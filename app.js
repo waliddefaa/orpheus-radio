@@ -3,8 +3,15 @@ const stations=[
  {id:'drone',name:'Drone Zone',genre:'Ambient',desc:'Atmospheric textures with minimal beats and maximum space.',url:'https://ice1.somafm.com/dronezone-128-mp3',color:'#201b18',accent:'#a94324'},
  {id:'indie',name:'Indie Pop Rocks!',genre:'Indie',desc:'New and classic indie pop from artists outside the mainstream.',url:'https://ice1.somafm.com/indiepop-128-mp3',color:'#c34d1d',accent:'#2b1714'},
  {id:'agent',name:'Secret Agent',genre:'Lounge',desc:'The soundtrack for stylish spies and elegant late nights.',url:'https://ice1.somafm.com/secretagent-128-mp3',color:'#31352d',accent:'#d29a43'},
- {id:'fluid',name:'Fluid',genre:'Electronic',desc:'Instrumental hip-hop, liquid trap and future soul.',url:'https://ice1.somafm.com/fluid-128-mp3',color:'#8c321d',accent:'#171714'},
- {id:'space',name:'Deep Space One',genre:'Space',desc:'Deep ambient electronics for drifting beyond the atmosphere.',url:'https://ice1.somafm.com/deepspaceone-128-mp3',color:'#171714',accent:'#b64d1c'}
+ {id:'fluid',name:'Fluid',genre:'Hip-Hop',desc:'Instrumental hip-hop, liquid trap and future soul.',url:'https://ice1.somafm.com/fluid-128-mp3',color:'#8c321d',accent:'#171714'},
+ {id:'space',name:'Deep Space One',genre:'Space',desc:'Deep ambient electronics for drifting beyond the atmosphere.',url:'https://ice1.somafm.com/deepspaceone-128-mp3',color:'#171714',accent:'#b64d1c'},
+ {id:'hitradio',name:'Hit Radio Morocco',genre:'Moroccan',desc:'Moroccan pop, chart hits and youth culture live from Rabat.',url:'https://hitradio-maroc.ice.infomaniak.ch/hitradio-maroc-128.mp3',color:'#a82126',accent:'#f1a126'},
+ {id:'mgharba',name:'100% Mgharba',genre:'Moroccan',desc:'A dedicated stream for contemporary Moroccan artists and songs.',url:'https://mgharba.ice.infomaniak.ch/mgharba-128.mp3',color:'#185844',accent:'#d9a33c'},
+ {id:'medina',name:'Medina FM',genre:'Moroccan',desc:'Moroccan music, conversation and culture from Meknes.',url:'https://medinafm.ice.infomaniak.ch/medinafm-128.mp3',color:'#8a3b20',accent:'#e5bd68'},
+ {id:'fipjazz',name:'FIP Jazz',genre:'Jazz',desc:'A refined mix spanning jazz classics, modern players and new discoveries.',url:'https://icecast.radiofrance.fr/fipjazz-midfi.mp3',color:'#26384a',accent:'#d49b43'},
+ {id:'fipblues',name:'FIP Blues',genre:'Blues',desc:'Electric, acoustic and roots blues selected around the clock.',url:'https://icecast.radiofrance.fr/fipblues-midfi.mp3',color:'#243f46',accent:'#c96536'},
+ {id:'fiphop',name:'FIP Hip-Hop',genre:'Hip-Hop',desc:'Old-school foundations, fresh rap and beats from across the map.',url:'https://icecast.radiofrance.fr/fiphiphop-midfi.mp3',color:'#3b253d',accent:'#e16635'},
+ {id:'hot108',name:'Hot 108 Jamz',genre:'Hip-Hop',desc:'Current hip-hop and R&B hits broadcasting live from New York.',url:'https://live.powerhitz.com/hot108',color:'#16191e',accent:'#d94c29'}
 ];
 const $=s=>document.querySelector(s);const audio=$('#audio'),grid=$('#stationGrid'),consoleEl=$('.console');
 let current=stations[0],playing=false,genre='All';let favorites=new Set(JSON.parse(localStorage.getItem('orpheus-favorites')||'[]'));
