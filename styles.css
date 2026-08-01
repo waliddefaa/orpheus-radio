@@ -5,3 +5,43 @@
 @media(max-width:1000px){.topbar p,.topbar nav{display:none}.topbar{justify-content:space-between}.hero{grid-template-columns:1fr}.now-copy h1 br{display:none}.console-bottom{grid-template-columns:135px 1fr auto}.station-grid{grid-template-columns:repeat(2,1fr)}.section-head{align-items:flex-start;flex-direction:column}.tools{align-items:flex-start;width:100%}.filters{justify-content:flex-start}}
 @media(max-width:650px){.topbar{height:70px;padding:0 18px}.brand{font-size:20px}.live-mark{padding-left:14px}.hero{padding:38px 18px;gap:34px}.now-copy h1{font-size:61px;line-height:.88}.play-main{width:72px;height:72px}.console{min-height:auto;padding:27px 20px}.console-bottom{grid-template-columns:100px 1fr}.signal{display:none}.visualizer{height:60px}.stations{padding:50px 18px 90px}.station-grid{grid-template-columns:1fr}.station-card{grid-template-columns:105px 1fr;min-height:140px}.cover{min-height:140px}.section-head h2{font-size:44px}.search{width:100%}.search input{width:100%}.about{padding:70px 22px}.about h2{font-size:40px}footer{flex-direction:column}.mini-player{grid-template-columns:1fr auto}.mini-player input{display:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* Analog motion and tactile controls */
+.console{--tuner-position:2%;--station-color:#7b2528;--station-accent:#d6541b;position:relative;overflow:hidden;transition:background .65s ease,box-shadow .35s ease}
+.console:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,235,199,.08) 49%,transparent 63%);transform:translateX(-115%);opacity:0}
+.console.tuning:after{animation:signal-sweep .65s ease-out}
+@keyframes signal-sweep{0%{transform:translateX(-115%);opacity:0}35%{opacity:1}100%{transform:translateX(115%);opacity:0}}
+.dial{position:relative}
+.dial-line{background:repeating-linear-gradient(90deg,rgba(236,196,145,.52) 0 1px,transparent 1px 2.5%),linear-gradient(90deg,transparent,rgba(236,196,145,.12),transparent);background-position:0 9px;background-repeat:no-repeat}
+.dial-line i{left:var(--tuner-position);transform:translateX(-50%);transition:left .75s cubic-bezier(.18,.82,.24,1.08),filter .25s ease;z-index:3;box-shadow:0 0 13px rgba(221,116,40,.75)}
+.dial-line i:before{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:var(--orange);left:50%;bottom:-5px;transform:translateX(-50%);box-shadow:0 0 0 4px rgba(200,76,19,.18)}
+.frequency-readout{position:absolute;left:50%;top:-28px;transform:translateX(-50%);font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.08em;color:#371015;background:var(--gold);padding:4px 6px;border-radius:4px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.22)}
+.frequency-readout:after{content:"";position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);border-width:4px 4px 0;border-style:solid;border-color:var(--gold) transparent transparent}
+.console.tuning .dial-line i{filter:brightness(1.8)}
+.console.connecting .dial-line i{animation:needle-search .28s ease-in-out infinite alternate}
+@keyframes needle-search{to{transform:translateX(-50%) translateX(4px)}}
+.visualizer b{will-change:height;box-shadow:0 0 8px rgba(213,150,64,.12)}
+.console.playing .visualizer b{animation:bar-glow 1.2s ease-in-out infinite alternate}
+@keyframes bar-glow{to{filter:brightness(1.32);box-shadow:0 0 8px rgba(213,150,64,.38)}}
+.album-art{background:color-mix(in srgb,var(--art-color,#e6cfaa) 25%,#e6cfaa);transition:background .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.console.tuning .album-art{transform:scale(.96) rotate(-1deg)}
+.album-art .sun{background:var(--art-accent,#d05119);transition:background .55s ease,transform .7s ease}
+.album-art .mountain.one{background:var(--art-color,#461016);transition:background .55s ease}
+.album-art .mountain.two{background:color-mix(in srgb,var(--art-accent,#ce4812) 78%,transparent);transition:background .55s ease}
+.volume-knob{--knob-angle:54deg;width:76px;height:76px;border-radius:50%;margin:18px auto 0;background:radial-gradient(circle at 38% 32%,#eed2a3 0 9%,#b27b3b 35%,#63401e 72%,#2e190f 100%);box-shadow:inset 0 0 0 3px rgba(255,224,177,.18),inset -8px -10px 14px rgba(0,0,0,.28),0 8px 16px rgba(0,0,0,.25);position:relative;transform:rotate(var(--knob-angle));transition:transform .12s ease}
+.volume-knob i{position:absolute;width:3px;height:23px;border-radius:3px;background:#fff1d2;left:calc(50% - 1px);top:8px;box-shadow:0 0 4px rgba(255,255,255,.45)}
+.knob-wrap input{margin-top:13px}
+.station-skip{display:flex;align-items:center;justify-content:center;gap:11px;margin-top:16px;color:#e9c9a2;text-transform:uppercase;letter-spacing:.13em;font-size:9px}
+.station-skip button{width:32px;height:27px;border:1px solid rgba(236,196,145,.3);border-radius:5px;background:rgba(0,0,0,.12);color:var(--gold);cursor:pointer;transition:background .18s ease,transform .18s ease}
+.station-skip button:hover{background:rgba(213,150,64,.18);transform:translateY(-1px)}
+.station-card{cursor:pointer}
+.station-card:after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--station-accent);transform:scaleY(0);transform-origin:center;transition:transform .28s ease}
+.station-card.selected{border-color:color-mix(in srgb,var(--station-accent) 70%,var(--line));box-shadow:0 11px 25px rgba(61,25,17,.11)}
+.station-card.selected:after{transform:scaleY(1)}
+.station-card.selected .card-body h3{color:var(--station-accent)}
+.card-frequency{position:absolute;z-index:2;left:9px;top:9px;background:rgba(34,13,12,.72);color:#f7dfba;border:1px solid rgba(255,235,199,.25);border-radius:99px;padding:3px 7px;font-size:9px;font-weight:600;letter-spacing:.08em;backdrop-filter:blur(4px)}
+.station-card.selected .card-frequency{background:var(--station-accent);color:white}
+.play-main:active,.card-play:active,.heart:active,.station-skip button:active{transform:scale(.94)}
+
+@media(max-width:650px){.volume-knob{width:58px;height:58px}.volume-knob i{height:17px;top:7px}.station-skip{gap:7px}.dial-line{background-size:auto}.frequency-readout{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.dial-line i,.album-art,.volume-knob{transition:none!important}}
