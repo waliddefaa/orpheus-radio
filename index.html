@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#651d25">
+  <meta name="description" content="Orpheus Radio — independent internet radio for curious listeners.">
+  <title>Orpheus Radio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Orpheus Radio home">ORPHEUS <span>RADIO</span></a>
+    <p>Independent sound, curated for the curious.</p>
+    <nav aria-label="Main navigation">
+      <a href="#stations">Stations</a><a href="#about">About</a>
+    </nav>
+    <div class="live-mark"><i></i> Live</div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="now-title">
+      <div class="now-copy">
+        <p class="eyebrow">✦ &nbsp; Now playing</p>
+        <h1 id="now-title">Groove<br>Salad</h1>
+        <p class="station-line" id="stationDescription">A nicely chilled plate of ambient beats and grooves.</p>
+        <div class="hero-actions">
+          <button class="play-main" id="playMain" aria-label="Play Groove Salad"><span>▶</span></button>
+          <span id="playLabel">Play live</span>
+          <button class="heart" id="heartMain" aria-label="Add to favorites" aria-pressed="false">♡</button>
+        </div>
+        <p class="status" id="status" aria-live="polite">Ready to play</p>
+      </div>
+
+      <div class="console" aria-label="Radio player controls">
+        <div class="dial">
+          <span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span>
+          <div class="dial-line"><i></i></div>
+        </div>
+        <div class="visualizer" id="visualizer" aria-hidden="true"></div>
+        <div class="console-bottom">
+          <div class="album-art" id="albumArt"><div class="sun"></div><div class="mountain one"></div><div class="mountain two"></div></div>
+          <div class="knob-wrap">
+            <label for="volume">Volume <output id="volumeOutput">70</output></label>
+            <input id="volume" type="range" min="0" max="100" value="70" aria-label="Volume">
+          </div>
+          <div class="signal"><span>ON AIR</span><i></i></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stations" id="stations" aria-labelledby="station-heading">
+      <div class="section-head">
+        <div><p class="eyebrow">Explore frequencies</p><h2 id="station-heading">Find your signal</h2></div>
+        <div class="tools">
+          <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search stations" aria-label="Search stations"></label>
+          <div class="filters" id="filters" aria-label="Filter by genre"></div>
+        </div>
+      </div>
+      <div class="station-grid" id="stationGrid"></div>
+      <p class="empty" id="empty" hidden>No stations match that search.</p>
+    </section>
+
+    <section class="about" id="about">
+      <p class="eyebrow">About Orpheus</p>
+      <h2>Radio without an algorithm shouting over the music.</h2>
+      <p>Six hand-picked streams. No account, no tracking, no subscription. Choose a frequency and let it run.</p>
+    </section>
+  </main>
+
+  <div class="mini-player" id="miniPlayer" hidden>
+    <div><small>Now playing</small><strong id="miniTitle">Groove Salad</strong></div>
+    <button id="miniPlay" aria-label="Play or pause">▶</button>
+    <input id="miniVolume" type="range" min="0" max="100" value="70" aria-label="Volume">
+  </div>
+
+  <footer><span>Orpheus Radio</span><span>Powered by independent broadcasters</span><span id="year"></span></footer>
+  <audio id="audio" preload="none"></audio>
+  <script src="app.js"></script>
+</body>
+</html>
