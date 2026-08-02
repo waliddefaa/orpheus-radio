@@ -42,6 +42,88 @@ let favorites = new Set(safeList('orpheus-favorites').filter(id => validStation(
 let recent = safeList('orpheus-recent').filter(id => validStation(id)).slice(0, 5);
 let currentTrack = {title:'Live broadcast', artist:current.name, live:false};
 
+const Feedback = (() => {
+  let context = null;
+  let enabled = localStorage.getItem('orpheus-feedback') !== 'off';
+
+  function getContext() {
+    if (!enabled) return null;
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return null;
+    if (!context) context = new Context();
+    if (context.state === 'suspended') context.resume().catch(() => {});
+    return context;
+  }
+
+  function tone(frequency, duration, volume = .012, type = 'sine', delay = 0, endFrequency = frequency) {
+    const ctx = getContext();
+    if (!ctx) return;
+    const start = ctx.currentTime + delay;
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, start);
+    oscillator.frequency.exponentialRampToValueAtTime(Math.max(40, endFrequency), start + duration);
+    gain.gain.setValueAtTime(.0001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + .008);
+    gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+    oscillator.connect(gain).connect(ctx.destination);
+    oscillator.start(start);
+    oscillator.stop(start + duration + .02);
+  }
+
+  function staticBurst(duration = .14, volume = .008) {
+    const ctx = getContext();
+    if (!ctx) return;
+    const length = Math.ceil(ctx.sampleRate * duration);
+    const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+    const source = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1450;
+    filter.Q.value = .65;
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + duration);
+    source.buffer = buffer;
+    source.connect(filter).connect(gain).connect(ctx.destination);
+    source.start();
+  }
+
+  function play(kind = 'tap') {
+    if (!enabled) return;
+    if (kind === 'tune') {
+      staticBurst(.16, .008);
+      tone(240, .15, .012, 'triangle', .01, 520);
+      tone(660, .08, .009, 'sine', .14, 760);
+    } else if (kind === 'confirm') {
+      tone(470, .08, .013, 'sine');
+      tone(720, .11, .012, 'sine', .055);
+    } else if (kind === 'cancel') {
+      tone(430, .075, .011, 'sine', 0, 290);
+    } else {
+      tone(760, .038, .009, 'sine', 0, 560);
+    }
+  }
+
+  function pulse(pattern = 7) {
+    if (!enabled || typeof navigator.vibrate !== 'function') return;
+    try { navigator.vibrate(pattern); } catch { /* vibration is optional */ }
+  }
+
+  function setEnabled(next) {
+    enabled = Boolean(next);
+    localStorage.setItem('orpheus-feedback', enabled ? 'on' : 'off');
+    if (!enabled && typeof navigator.vibrate === 'function') {
+      try { navigator.vibrate(0); } catch { /* vibration is optional */ }
+    }
+  }
+
+  return {play, pulse, setEnabled, isEnabled:() => enabled};
+})();
+
 const stateCopy = {
   idle: ['Ready', 'Ready to play'],
   connecting: ['Tuning', 'Finding the live signal…'],
@@ -306,12 +388,13 @@ function toggle() {
   ['playing', 'buffering', 'connecting'].includes(playerState) ? pause() : play();
 }
 
-function selectStation(id, autoplay = false, updateAddress = true) {
+function selectStation(id, autoplay = false, updateAddress = true, withFeedback = true) {
   const next = validStation(id);
   if (!next) return;
   const changed = next.id !== current.id;
-  if (!changed && autoplay) { toggle(); return; }
+  if (!changed && autoplay) { if (withFeedback) { Feedback.play('tap'); Feedback.pulse(7); } toggle(); return; }
   if (changed) {
+    if (withFeedback) { Feedback.play('tune'); Feedback.pulse([10, 20, 12]); }
     clearConnectionTimer();
     audio.pause();
     audio.removeAttribute('src');
@@ -424,6 +507,8 @@ function setSleepTimer(minutes) {
   localStorage.setItem('orpheus-sleep-end', String(Date.now() + duration));
   localStorage.setItem('orpheus-sleep-duration', String(duration));
   updateSleepTimer();
+  Feedback.play('confirm');
+  Feedback.pulse([12, 28, 18]);
   $('#sleepDialog').close();
   showToast(`Sleep timer set for ${minutes} minutes.`);
 }
@@ -432,6 +517,8 @@ function cancelSleepTimer() {
   localStorage.removeItem('orpheus-sleep-end');
   localStorage.removeItem('orpheus-sleep-duration');
   updateSleepTimer();
+  Feedback.play('cancel');
+  Feedback.pulse(8);
   showToast('Sleep timer cancelled.');
 }
 
@@ -452,7 +539,48 @@ function surpriseMe() {
   showToast('A new signal found.');
 }
 
+function setupFeedbackControl() {
+  const button = document.createElement('button');
+  button.id = 'feedbackToggle';
+  button.type = 'button';
+  button.innerHTML = '<span aria-hidden="true">♪</span> <b>Sound on</b>';
+  $('.quick-actions').append(button);
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .quick-actions{grid-template-columns:repeat(4,1fr)}
+    #feedbackToggle[aria-pressed="true"]{background:rgba(213,150,64,.15);border-color:rgba(236,196,145,.48)}
+    #feedbackToggle b{font-weight:500}
+    @media(max-width:650px){.quick-actions{grid-template-columns:repeat(2,1fr)}}
+  `;
+  document.head.append(style);
+
+  const refresh = () => {
+    const on = Feedback.isEnabled();
+    button.setAttribute('aria-pressed', String(on));
+    button.setAttribute('aria-label', `Turn interaction sound ${on ? 'off' : 'on'}`);
+    button.querySelector('span').textContent = on ? '♪' : '♩';
+    button.querySelector('b').textContent = on ? 'Sound on' : 'Sound off';
+  };
+
+  button.addEventListener('click', () => {
+    const next = !Feedback.isEnabled();
+    if (!next) Feedback.play('cancel');
+    Feedback.setEnabled(next);
+    if (next) { Feedback.play('confirm'); Feedback.pulse(10); }
+    refresh();
+    showToast(`Interaction sound ${next ? 'on' : 'off'}.`);
+  });
+  refresh();
+}
+
 function wireEvents() {
+  document.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || button.matches('#feedbackToggle,.timer-options button,#cancelTimer,#prevStation,#nextStation,#tryAnother,#surpriseMe,.recent-station,.card-play')) return;
+    Feedback.play('tap');
+    Feedback.pulse(6);
+  });
   $('#filters').addEventListener('click', event => {
     const button = event.target.closest('.filter');
     if (!button) return;
@@ -510,7 +638,7 @@ function wireEvents() {
   });
   window.addEventListener('popstate', () => {
     const id = new URL(location.href).searchParams.get('station');
-    if (validStation(id) && id !== current.id) selectStation(id, false, false);
+    if (validStation(id) && id !== current.id) selectStation(id, false, false, false);
   });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshMetadata(); });
 
@@ -525,6 +653,7 @@ function wireEvents() {
 
 function init() {
   buildVisualizer();
+  setupFeedbackControl();
   renderFilters();
   renderStations();
   renderRecent();
