@@ -93,7 +93,20 @@ function showToast(message) {
   toast.textContent = message;
   toast.hidden = false;
   clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => { toast.hidden = true; }, 2800);
+  clearTimeout(showToast.hideTimer);
+  requestAnimationFrame(() => toast.classList.add('is-visible'));
+  showToast.timer = window.setTimeout(() => {
+    toast.classList.remove('is-visible');
+    showToast.hideTimer = window.setTimeout(() => { toast.hidden = true; }, 260);
+  }, 2800);
+}
+
+function animateStationDetails() {
+  const copy = $('.now-copy');
+  copy.classList.remove('station-transition');
+  void copy.offsetWidth;
+  copy.classList.add('station-transition');
+  window.setTimeout(() => copy.classList.remove('station-transition'), 520);
 }
 
 function setPlayerState(next, message) {
@@ -163,8 +176,8 @@ function visibleStations() {
 
 function renderStations() {
   const visible = visibleStations();
-  grid.innerHTML = visible.map(station => `
-    <article class="station-card ${station.id === current.id ? 'selected' : ''}" data-id="${station.id}" style="--station-accent:${station.accent}">
+  grid.innerHTML = visible.map((station, index) => `
+    <article class="station-card ${station.id === current.id ? 'selected' : ''}" data-id="${station.id}" style="--station-accent:${station.accent};--enter-index:${index}">
       <div class="cover" style="--card:${station.color};--accent:${station.accent}"><span class="card-frequency">${station.freq.toFixed(1)} <i>virtual</i></span></div>
       <div class="card-body"><h3>${station.name}</h3><span class="genre">${station.genre}</span>
         <div class="card-controls"><small>${station.id === current.id && playerState === 'playing' ? 'Playing live' : station.id === current.id ? 'Selected station' : 'Listen live'}</small><button class="card-play ${station.id === current.id && playerState === 'playing' ? 'playing' : ''}" aria-label="${station.id === current.id && playerState === 'playing' ? 'Pause' : 'Play'} ${station.name}">${station.id === current.id && playerState === 'playing' ? 'Ⅱ' : '▶'}</button></div>
@@ -310,6 +323,7 @@ function selectStation(id, autoplay = false, updateAddress = true) {
     resetMetadata();
     setPlayerState('idle', `Selected ${current.name} · ${current.freq.toFixed(1)} virtual FM`);
     updateMain(true);
+    animateStationDetails();
     renderRecent();
     renderStations();
     refreshMetadata();
@@ -360,21 +374,45 @@ function configureMediaSession() {
   updateMediaSession();
 }
 
+function formatTimer(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
 function updateSleepTimer() {
   clearInterval(sleepInterval);
   const end = Number(localStorage.getItem('orpheus-sleep-end')) || 0;
+  const duration = Number(localStorage.getItem('orpheus-sleep-duration')) || Math.max(0, end - Date.now());
   const tick = () => {
     const remaining = end - Date.now();
     if (remaining <= 0) {
       clearInterval(sleepInterval);
       localStorage.removeItem('orpheus-sleep-end');
+      localStorage.removeItem('orpheus-sleep-duration');
       $('#sleepLabel').textContent = 'Sleep timer';
+      $('#sleepRemaining').hidden = true;
+      $('#sleepButton').classList.remove('timer-active');
+      $('#sleepButton').style.removeProperty('--timer-progress');
+      $('#sleepButton').setAttribute('aria-label', 'Set sleep timer');
+      $('#activeTimer').hidden = true;
       $('#cancelTimer').hidden = true;
       if (end) { pause(); showToast('Sleep timer ended. Good night.'); }
       return;
     }
-    const minutes = Math.ceil(remaining / 60000);
-    $('#sleepLabel').textContent = `Sleep · ${minutes}m`;
+    const countdown = formatTimer(remaining);
+    const progress = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 1;
+    $('#sleepLabel').textContent = 'Sleep timer';
+    $('#sleepRemaining').textContent = `${countdown} left`;
+    $('#sleepRemaining').hidden = false;
+    $('#sleepButton').classList.add('timer-active');
+    $('#sleepButton').style.setProperty('--timer-progress', `${progress * 360}deg`);
+    $('#sleepButton').setAttribute('aria-label', `Sleep timer, ${countdown} remaining. Open timer settings`);
+    $('#activeTimer').hidden = false;
+    $('#dialogCountdown').textContent = countdown;
+    $('#sleepEndsAt').textContent = `Playback stops at ${new Intl.DateTimeFormat([], {hour:'numeric', minute:'2-digit'}).format(new Date(end))}`;
+    $('#dialogTimerProgress').style.transform = `scaleX(${progress})`;
     $('#cancelTimer').hidden = false;
   };
   tick();
@@ -382,7 +420,9 @@ function updateSleepTimer() {
 }
 
 function setSleepTimer(minutes) {
-  localStorage.setItem('orpheus-sleep-end', String(Date.now() + minutes * 60000));
+  const duration = minutes * 60000;
+  localStorage.setItem('orpheus-sleep-end', String(Date.now() + duration));
+  localStorage.setItem('orpheus-sleep-duration', String(duration));
   updateSleepTimer();
   $('#sleepDialog').close();
   showToast(`Sleep timer set for ${minutes} minutes.`);
@@ -390,6 +430,7 @@ function setSleepTimer(minutes) {
 
 function cancelSleepTimer() {
   localStorage.removeItem('orpheus-sleep-end');
+  localStorage.removeItem('orpheus-sleep-duration');
   updateSleepTimer();
   showToast('Sleep timer cancelled.');
 }
