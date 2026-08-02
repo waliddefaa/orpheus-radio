@@ -81,7 +81,11 @@
         </div>
         <div class="quick-actions" aria-label="Radio tools">
           <button id="surpriseMe" type="button"><span>↝</span> Surprise me</button>
-          <button id="sleepButton" type="button"><span>☾</span> <b id="sleepLabel">Sleep timer</b></button>
+          <button id="sleepButton" type="button" aria-label="Set sleep timer">
+            <span>☾</span>
+            <span class="quick-action-copy"><b id="sleepLabel">Sleep timer</b><small id="sleepRemaining" hidden>Not set</small></span>
+            <i class="sleep-progress" id="sleepProgress" aria-hidden="true"></i>
+          </button>
           <button id="shareStation" type="button"><span>↗</span> Share station</button>
         </div>
       </div>
@@ -124,6 +128,10 @@
       <p class="eyebrow">Sleep timer</p>
       <h2 id="sleepTitle">Drift off. We’ll handle the silence.</h2>
       <p>Orpheus will pause automatically when the timer ends.</p>
+      <div class="active-timer" id="activeTimer" hidden aria-live="polite">
+        <div><small>Timer active</small><strong id="dialogCountdown">00:00</strong><span id="sleepEndsAt"></span></div>
+        <div class="timer-progress" aria-hidden="true"><i id="dialogTimerProgress"></i></div>
+      </div>
       <div class="timer-options">
         <button value="15" type="button">15 min</button><button value="30" type="button">30 min</button>
         <button value="45" type="button">45 min</button><button value="60" type="button">60 min</button>
