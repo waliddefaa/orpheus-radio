@@ -4,7 +4,7 @@ A warm, installable internet radio built as a static site for GitHub Pages.
 
 ## Features
 
-- Thirteen live HTTPS stations across Moroccan, jazz, blues, hip-hop, ambient and more
+- Sixteen live HTTPS stations across Moroccan, lo-fi/study, jazz, blues, hip-hop, ambient and more
 - Live track metadata for supported SomaFM broadcasters, with honest fallbacks elsewhere
 - Search, genre filtering, and a dedicated favorites view
 - Persistent favorites, volume, last station, and recently played history
