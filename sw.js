@@ -1,4 +1,4 @@
-const CACHE = 'orpheus-radio-v4';
+const CACHE = 'orpheus-radio-v5';
 const CORE = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/app-icon.svg', './icons/app-icon-192.png', './icons/app-icon-512.png'];
 
 self.addEventListener('install', event => {
