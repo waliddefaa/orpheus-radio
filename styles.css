@@ -14,3 +14,25 @@
 @media(max-width:650px){.quick-actions #sleepButton{flex-direction:column;gap:2px}.quick-actions .quick-action-copy{align-items:center}.quick-actions .quick-action-copy small{font-size:7px}.quick-actions #sleepButton.timer-active{padding-right:18px}.sleep-progress{right:5px;width:12px;height:12px}.active-timer strong{font-size:27px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 html[data-player-state=playing] .state-dot{background:#83a55a;box-shadow:0 0 0 4px rgba(131,165,90,.14)}html[data-player-state=connecting] .state-dot,html[data-player-state=buffering] .state-dot{background:var(--gold)}html[data-player-state=unavailable] .state-dot{background:#d45b48}
+
+/* Geometric play/pause controls stay optically centered across every font and browser. */
+.play-main,.card-play,.mini-player button{display:inline-grid;place-items:center;position:relative;isolation:isolate;overflow:visible}
+.play-main{transition:transform .22s cubic-bezier(.2,.8,.2,1),background-color .22s ease,box-shadow .28s ease}
+.play-main::after{content:"";position:absolute;inset:-6px;border:1px solid rgba(200,76,19,.34);border-radius:inherit;opacity:0;transform:scale(.9);z-index:-1;transition:opacity .28s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
+.play-main:hover::after,.play-main:focus-visible::after{opacity:1;transform:scale(1)}
+.play-main.is-playing{box-shadow:0 12px 24px rgba(104,31,20,.22),0 0 0 5px rgba(200,76,19,.11)}
+.play-main.is-playing::after{animation:play-halo 2.2s ease-out infinite}
+.play-icon{display:block!important;position:relative;width:20px;height:22px;margin:0!important;color:currentColor;font-size:0!important;line-height:0;transform:translateX(1.5px);transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .16s ease}
+.play-icon::before{content:"";position:absolute;left:4px;top:2px;width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:14px solid currentColor;filter:drop-shadow(0 1px 1px rgba(54,16,10,.12));transition:opacity .14s ease,transform .2s cubic-bezier(.2,.8,.2,1)}
+.play-icon::after{content:"";position:absolute;left:3px;top:2px;width:14px;height:18px;background:linear-gradient(90deg,currentColor 0 5px,transparent 5px 9px,currentColor 9px 14px);opacity:0;transform:scale(.72);transition:opacity .14s ease,transform .2s cubic-bezier(.2,.8,.2,1)}
+.is-playing .play-icon{transform:translateX(0)}
+.is-playing .play-icon::before{opacity:0;transform:scale(.72)}
+.is-playing .play-icon::after{opacity:1;transform:scale(1)}
+.card-play .play-icon,.mini-player button .play-icon{width:14px;height:16px;transform:translateX(1px)}
+.mini-player button .play-icon{color:inherit!important}
+.card-play .play-icon::before,.mini-player button .play-icon::before{left:3px;top:2px;border-top-width:6px;border-bottom-width:6px;border-left-width:9px}
+.card-play .play-icon::after,.mini-player button .play-icon::after{left:2px;top:2px;width:10px;height:12px;background:linear-gradient(90deg,currentColor 0 4px,transparent 4px 6px,currentColor 6px 10px)}
+.card-play.is-playing .play-icon,.mini-player button.is-playing .play-icon{transform:translateX(0)}
+.play-main:active .play-icon,.card-play:active .play-icon,.mini-player button:active .play-icon{transform:scale(.86)}
+@keyframes play-halo{0%{opacity:.45;transform:scale(.94)}70%,100%{opacity:0;transform:scale(1.12)}}
+@media(prefers-reduced-motion:reduce){.play-main.is-playing::after{animation:none;opacity:.45;transform:scale(1)}}
