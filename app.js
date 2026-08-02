@@ -265,7 +265,7 @@ function renderStations() {
     <article class="station-card ${station.id === current.id ? 'selected' : ''}" data-id="${station.id}" style="--station-accent:${station.accent};--enter-index:${index}">
       <div class="cover" style="--card:${station.color};--accent:${station.accent}"><span class="card-frequency">${station.freq.toFixed(1)} <i>virtual</i></span></div>
       <div class="card-body"><h3>${station.name}</h3><span class="genre">${station.genre}</span>
-        <div class="card-controls"><small>${station.id === current.id && playerState === 'playing' ? 'Playing live' : station.id === current.id ? 'Selected station' : 'Listen live'}</small><button class="card-play ${station.id === current.id && playerState === 'playing' ? 'playing' : ''}" aria-label="${station.id === current.id && playerState === 'playing' ? 'Pause' : 'Play'} ${station.name}">${station.id === current.id && playerState === 'playing' ? 'Ⅱ' : '▶'}</button></div>
+        <div class="card-controls"><small>${station.id === current.id && playerState === 'playing' ? 'Playing live' : station.id === current.id ? 'Selected station' : 'Listen live'}</small><button class="card-play ${station.id === current.id && playerState === 'playing' ? 'playing is-playing' : ''}" aria-label="${station.id === current.id && playerState === 'playing' ? 'Pause' : 'Play'} ${station.name}"><span class="play-icon" aria-hidden="true"></span></button></div>
       </div>
       <button class="fav ${favorites.has(station.id) ? 'active' : ''}" aria-label="${favorites.has(station.id) ? 'Remove from' : 'Add to'} favorites">${favorites.has(station.id) ? '♥' : '♡'}</button>
     </article>`).join('');
@@ -298,10 +298,9 @@ function updateMain(animateTuner = false) {
   $('#heartMain').setAttribute('aria-pressed', String(isFavorite));
   $('#heartMain').setAttribute('aria-label', `${isFavorite ? 'Remove' : 'Add'} ${current.name} ${isFavorite ? 'from' : 'to'} favorites`);
   const playing = playerState === 'playing' || playerState === 'buffering' || playerState === 'connecting';
-  const icon = playing ? 'Ⅱ' : '▶';
-  $('#playMain span').textContent = icon;
+  $('#playMain').classList.toggle('is-playing', playing);
   $('#playMain').setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} ${current.name}`);
-  $('#miniPlay').textContent = icon;
+  $('#miniPlay').classList.toggle('is-playing', playing);
   $('#playLabel').textContent = playing ? 'Pause live' : 'Play live';
   $('#miniPlayer').hidden = !hasStarted;
   document.title = `${playerState === 'playing' ? '▶ ' : ''}${current.name} — Orpheus Radio`;
