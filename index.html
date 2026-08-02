@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#651d25">
-  <meta name="description" content="Orpheus Radio — independent internet radio for curious listeners.">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#641d25">
+  <meta name="description" content="Orpheus Radio — hand-picked internet radio for curious listeners.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Orpheus">
   <title>Orpheus Radio</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/app-icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
@@ -13,38 +19,54 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#" aria-label="Orpheus Radio home">ORPHEUS <span>RADIO</span></a>
+    <a class="brand" href="#top" aria-label="Orpheus Radio home">ORPHEUS <span>RADIO</span></a>
     <p>Independent sound, curated for the curious.</p>
     <nav aria-label="Main navigation">
       <a href="#stations">Stations</a><a href="#about">About</a>
     </nav>
+    <button class="install-button" id="installApp" type="button">Install app</button>
     <div class="live-mark"><i></i> Live</div>
   </header>
 
-  <main>
+  <main id="top">
     <section class="hero" aria-labelledby="now-title">
       <div class="now-copy">
         <p class="eyebrow">✦ &nbsp; Now playing</p>
         <h1 id="now-title">Groove<br>Salad</h1>
+        <div class="track-meta" aria-live="polite">
+          <span class="metadata-badge" id="metadataBadge">Live stream</span>
+          <strong id="trackTitle">Live broadcast</strong>
+          <span id="trackArtist">Groove Salad</span>
+        </div>
         <p class="station-line" id="stationDescription">A nicely chilled plate of ambient beats and grooves.</p>
         <div class="hero-actions">
           <button class="play-main" id="playMain" aria-label="Play Groove Salad"><span>▶</span></button>
           <span id="playLabel">Play live</span>
           <button class="heart" id="heartMain" aria-label="Add to favorites" aria-pressed="false">♡</button>
         </div>
-        <p class="status" id="status" aria-live="polite">Ready to play</p>
+        <div class="state-line">
+          <span class="state-dot" id="stateDot"></span>
+          <p class="status" id="status" aria-live="polite">Ready to play</p>
+        </div>
+        <div class="recovery" id="recovery" hidden>
+          <p>The broadcaster is not responding right now.</p>
+          <button id="retryStream" type="button">Retry</button>
+          <button id="tryAnother" type="button">Try another station</button>
+        </div>
       </div>
 
-      <div class="console" aria-label="Radio player controls">
+      <div class="console" aria-label="Radio player controls" data-state="idle">
+        <div class="console-state" aria-hidden="true"><span id="signalLabel">Ready</span><i></i></div>
         <div class="dial">
           <span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span>
           <div class="dial-line">
-            <i id="tunerNeedle"><span id="frequencyReadout">88.4</span></i>
+            <i id="tunerNeedle"><span class="frequency-readout" id="frequencyReadout">88.4</span></i>
           </div>
+          <small>Virtual frequency · Internet radio</small>
         </div>
         <div class="visualizer" id="visualizer" aria-hidden="true"></div>
         <div class="console-bottom">
-          <div class="album-art" id="albumArt"><div class="sun"></div><div class="mountain one"></div><div class="mountain two"></div></div>
+          <div class="album-art" id="albumArt" aria-hidden="true"><div class="sun"></div><div class="mountain one"></div><div class="mountain two"></div></div>
           <div class="knob-wrap">
             <label for="volume">Volume <output id="volumeOutput">70</output></label>
             <div class="volume-knob" id="volumeKnob" aria-hidden="true"><i></i></div>
@@ -57,34 +79,60 @@
           </div>
           <div class="signal"><span>ON AIR</span><i></i></div>
         </div>
+        <div class="quick-actions" aria-label="Radio tools">
+          <button id="surpriseMe" type="button"><span>↝</span> Surprise me</button>
+          <button id="sleepButton" type="button"><span>☾</span> <b id="sleepLabel">Sleep timer</b></button>
+          <button id="shareStation" type="button"><span>↗</span> Share station</button>
+        </div>
       </div>
     </section>
 
     <section class="stations" id="stations" aria-labelledby="station-heading">
+      <div class="recent-wrap" id="recentWrap" hidden>
+        <div class="recent-head"><div><p class="eyebrow">Jump back in</p><h2>Recently played</h2></div><button id="clearRecent" type="button">Clear history</button></div>
+        <div class="recent-list" id="recentList"></div>
+      </div>
+
       <div class="section-head">
-        <div><p class="eyebrow">Explore frequencies</p><h2 id="station-heading">Find your signal</h2></div>
+        <div><p class="eyebrow">Explore stations</p><h2 id="station-heading">Find your signal</h2></div>
         <div class="tools">
           <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search stations" aria-label="Search stations"></label>
-          <div class="filters" id="filters" aria-label="Filter by genre"></div>
+          <div class="filters" id="filters" aria-label="Filter stations"></div>
         </div>
       </div>
+      <div class="results-line"><span id="resultCount">13 stations</span><span>All frequencies are virtual</span></div>
       <div class="station-grid" id="stationGrid"></div>
-      <p class="empty" id="empty" hidden>No stations match that search.</p>
+      <div class="empty" id="empty" hidden><strong>No stations found.</strong><span>Try another search or clear this filter.</span></div>
     </section>
 
     <section class="about" id="about">
       <p class="eyebrow">About Orpheus</p>
       <h2>Radio without an algorithm shouting over the music.</h2>
-      <p>Thirteen hand-picked streams across Moroccan music, jazz, blues, hip-hop, ambient and more. No account, no tracking, no subscription. Choose a frequency and let it run.</p>
+      <p>Thirteen hand-picked streams across Moroccan music, jazz, blues, hip-hop, ambient and more. No account, no tracking, no subscription. Choose a virtual frequency and let it run.</p>
     </section>
   </main>
 
   <div class="mini-player" id="miniPlayer" hidden>
-    <div><small>Now playing</small><strong id="miniTitle">Groove Salad</strong></div>
+    <div><small id="miniState">Now playing</small><strong id="miniTitle">Groove Salad</strong><span id="miniTrack">Live broadcast</span></div>
     <button id="miniPlay" aria-label="Play or pause">▶</button>
     <input id="miniVolume" type="range" min="0" max="100" value="70" aria-label="Volume">
   </div>
 
+  <dialog class="sleep-dialog" id="sleepDialog" aria-labelledby="sleepTitle">
+    <form method="dialog">
+      <button class="dialog-close" value="close" aria-label="Close">×</button>
+      <p class="eyebrow">Sleep timer</p>
+      <h2 id="sleepTitle">Drift off. We’ll handle the silence.</h2>
+      <p>Orpheus will pause automatically when the timer ends.</p>
+      <div class="timer-options">
+        <button value="15" type="button">15 min</button><button value="30" type="button">30 min</button>
+        <button value="45" type="button">45 min</button><button value="60" type="button">60 min</button>
+      </div>
+      <button class="cancel-timer" id="cancelTimer" type="button" hidden>Cancel active timer</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <footer><span>Orpheus Radio</span><span>Powered by independent broadcasters</span><span id="year"></span></footer>
   <audio id="audio" preload="none"></audio>
   <script src="app.js"></script>
